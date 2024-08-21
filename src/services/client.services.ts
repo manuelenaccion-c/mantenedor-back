@@ -21,10 +21,10 @@ export class ClientServices {
     if (!validateEmail(email)) {
         throw new BadRequestException('Correo electrónico no es válido');
     }
-    if (!/^[a-zA-Z0-9]+$/.test(name)) {
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(name)) {
         throw new BadRequestException('El nombre solo puede contener letras y números');
     }
-    if (!/^[a-zA-Z0-9]+$/.test(last_name)) {
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(last_name)) {
         throw new BadRequestException('El apellido solo puede contener letras y números');
     }
     }

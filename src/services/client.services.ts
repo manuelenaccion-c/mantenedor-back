@@ -121,7 +121,9 @@ export class ClientServices {
 
       const clients = await query.getMany();
       if (clients.length === 0) {
-        throw new NotFoundException('No se encontraron clientes que coincidan con los criterios');
+        statusCode: 200  
+        data: []
+        message: 'No se encontraron clientes que coincidan con los criterios'
       }
     
       return clients;

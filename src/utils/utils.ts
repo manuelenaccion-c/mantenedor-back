@@ -2,3 +2,11 @@ export function validateEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   }
+
+
+  export function getMonthDate(): string {
+    const getActualMonth = new Date
+    const month = getActualMonth.getMonth();
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiemre", "Octubre", "Noviembre", "Diciembre"];
+    return monthNames[month]
+  }

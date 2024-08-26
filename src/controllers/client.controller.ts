@@ -57,8 +57,9 @@ export class ClientController {
     return this.clientService.deleteClient(id)
   }
 
-
-
-
-
+  @Get('/overall')
+  dasboardClient(){
+    return this.clientService.dashboardData()
+  }
+  
 }

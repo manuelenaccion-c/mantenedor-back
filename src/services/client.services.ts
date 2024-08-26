@@ -3,7 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { Client } from 'src/entitys/client.entity';
 import { validateRut } from '@fdograph/rut-utilities';
-import { validateEmail } from 'src/utils/utils';
+import { getMonthDate, validateEmail } from 'src/utils/utils';
+
 
 @Injectable()
 export class ClientServices {
@@ -128,7 +129,51 @@ export class ClientServices {
     
       return clients;
     }
-}
+
+    async dashboardData() {
+
+    const totalClients = await this.clientRepository.count();
+    const activeClients = await this.clientRepository.count({ where: { status: true } });
+    const inactiveClients = totalClients - activeClients;
+    const genderMale = await this.clientRepository.count({where: {gender: "Masculino"}});
+    const genderFemale = await this.clientRepository.count({where: {gender: "Femenino"}});
+    const clientByMonth = await this.clientRepository.createQueryBuilder("client")
+    .select("TO_CHAR(client.created_at, 'Month')", "month")
+    .addSelect("COUNT(*)", "count")
+    .groupBy("TO_CHAR(client.created_at, 'Month')")
+    .orderBy("TO_CHAR(client.created_at, 'Month')")
+    .getRawMany();
+
+    const recentClients = await this.clientRepository.find({
+      order: { created_at: 'DESC' },
+      take: 3, // Limitar a los 3 clientes más recientes
+    });
+
+    const inactiveClientsData = await this.clientRepository.find({
+      where: { status: false },
+      order: { created_at: 'DESC' }
+    });
+
+    const orderClientsMonth = clientByMonth.length !== 0 ? clientByMonth.map(monthData => ({
+      month: monthData.month.trim(),
+      count: parseInt(monthData.count, 10)
+    })) : [{month: getMonthDate(), count: 0}]
+
+    return {
+      statistics_clients: [
+        { total: totalClients, title: "Clientes totales" },
+        { total: activeClients, title: "Clientes activos" },
+        { total: inactiveClients, title: "Clientes Inactivos" }
+      ],
+      gender_distribution: [
+        {gender: "Masculino", count: genderMale},
+        {gender: "Femenino", count: genderFemale}
+      ],
+      client_month: orderClientsMonth,
+      recent_clients: recentClients,
+      inactive_clients_data: inactiveClientsData
+    };
+  }
 
   
-
+}
